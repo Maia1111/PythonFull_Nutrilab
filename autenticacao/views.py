@@ -1,7 +1,11 @@
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from .utils import password_is_valid
 from django.shortcuts import redirect
+from django.contrib.auth.models import User
+from django.contrib.messages import constants
+from django.contrib import messages
 
 def cadastro(request):
    if request.method == "GET":
@@ -16,8 +20,16 @@ def cadastro(request):
       if  not password_is_valid(request, senha, confirmar_senha):
           return redirect('/auth/cadastro')
     
-      return HttpResponse( 'Testando!')
-         
+      try:
+          user = User.objects.create_user(username=usuario, password=senha, is_active=False)
+          user.save()
+          messages.add_message(request, constants.SUCCESS, "Cadastro realizado com sucesso!")
+          return redirect('/auth/logar')
+      
+      except:          
+            return redirect('/auth/cadastro')
+      
+    
           
 
      
